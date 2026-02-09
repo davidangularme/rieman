@@ -5,6 +5,74 @@ ORCID icon
 Description
  
 https://zenodo.org/records/18523391
+# Harmonic Ontology (Toy Numerical Implementation)
+Numerical experiments inspired by the documents:
+
+- **“The Harmonic Ontology: A Noncommutative Idele-Class Spectral Framework Toward the Riemann Hypothesis”** (Complete Edition, Feb 2026)
+- **“The Harmonic Ontology …”** (Revised Edition: mollified potential + operational trace, Feb 2026)
+
+This repository contains a **toy numerical model** for:
+1) an **operational-trace HTI-style stability test** (test A), and  
+2) a **spectral identification test** (test B),
+
+based on a discretized version of an operator of the form:
+
+\[
+H_\varepsilon \;=\; D \;+\; V_\varepsilon
+\]
+
+where:
+- \(D\) is a Stone-generator-type operator (modeled as \(-i\,d/dt\) in a 1D coordinate \(t\)),
+- \(V_\varepsilon\) is a **bounded, mollified** potential derived from \(\xi'/\xi(1/2+it)\) on the critical line.
+
+> Important: this code **does not implement the full idele class Hilbert space** \(L^2(C_\mathbb{Q})\).  
+> It is a **1D proxy** that retains the “\(t=\log|x|\)” direction and drops/ignores the compact fiber \(C^1_\mathbb{Q}\).
+> Any “agreement” is only a numerical consistency check for the toy model, not a proof of any conjecture.
+
+---
+
+## Contents
+
+- `harmonic_operator.py`  
+  Core construction of a sparse matrix model for \(H_\varepsilon = D + V_\varepsilon\) on a grid in \(t\); includes
+  - mollified potential computation on a grid,
+  - truncated prime-side sum,
+  - trace proxy using Hutchinson + `expm_multiply`,
+  - shift-invert eigenvalue extraction (`eigsh` with `sigma`).
+
+- `run_hti_convergence.py`  
+  **Test (A)**: HTI-style stability experiment via a computed effective constant
+  \[
+  \widehat C(T)=\frac{\tau_T(f_T(H_\varepsilon)) - P_{N,K}(f_T)}{\widehat f_T(0)}.
+  \]
+  The test looks for **stabilization** of \(\widehat C(T)\) as discretization and truncations are refined.
+
+- `run_spectral_identification.py`  
+  **Test (B)**: “spectral identification” experiment comparing eigenvalues of the discrete \(H_\varepsilon\) to the
+  first zeta zero ordinates \(\gamma_n\) (via `mpmath.zetazero(n)`).
+
+- `operational_extras.py`  
+  Additional requested features:
+  1. **Explicit window \(P_T\)** implemented as a mask (projection) on a *larger* simulation domain.
+  2. **Calibration on \(D\)** (the free case \(V=0\)) to stabilize the numerical spectral density.
+  3. **Disk cache** (`.npz`) for the computed potential \(v_\varepsilon(t)\).
+
+---
+
+## Installation
+
+### Requirements
+- Python 3.10+ recommended
+- Packages:
+  - `numpy`
+  - `scipy`
+  - `mpmath`
+  - `sympy` (only needed for some prime generation variants; `operational_extras.py` provides a fast sieve)
+
+Install:
+```bash
+pip install numpy scipy mpmath sympy
+
 Citations / References:
 Blum, F. D. (2026). The Harmonic Ontology: A Noncommutative Idele-Class Spectral Framework Toward the Riemann Hypothesis (Revised Edition: Appendix-Philosophy + Mollified Potential + Operational Semifinite Trace).
 
